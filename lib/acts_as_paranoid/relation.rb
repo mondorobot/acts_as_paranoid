@@ -21,7 +21,17 @@ module ActsAsParanoid
         
         def delete_all(conditions = nil)
           if paranoid?
-            update_all(paranoid_deletion_attributes, conditions)
+            # ORIGINAL UPDATE CALL
+            #update_all(paranoid_deletion_attributes, conditions)
+
+            # MODIFIED UPDATE CALL
+            rs = @klass.where(scope_for_create)
+
+            rs.each do |child_rec|
+              child_rec.update_attributes paranoid_deletion_attributes
+            end
+
+            rs.length
           else
             delete_all!(conditions)
           end
